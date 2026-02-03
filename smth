@@ -17,7 +17,7 @@ harmanTrack.Looped = true
 local targetWeight = 1
 local currentWeight = 0
 local lerpSpeed = 0.15 -- Yumuşatma hızı (ne kadar düşükse o kadar yavaş/smooth olur)
-local mermiFrame = 1.80 -- Sabit duracağı kare
+local mermiFrame = 1.60 -- Sabit duracağı kare
 
 -- Başlat
 harmanTrack:Play(0.1, 0, 0) -- 0 ağırlık ve 0 hızla başla
