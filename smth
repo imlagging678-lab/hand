@@ -1,0 +1,51 @@
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+
+local player = game.Players.LocalPlayer
+local char = player.Character or player.CharacterAdded:Wait()
+local hum = char:WaitForChild("Humanoid")
+local animator = hum:WaitForChild("Animator")
+
+-- Animasyon Hazırlığı
+local harmanAnim = Instance.new("Animation")
+harmanAnim.AnimationId = "rbxassetid://29517689"
+local harmanTrack = animator:LoadAnimation(harmanAnim)
+harmanTrack.Priority = Enum.AnimationPriority.Action4
+harmanTrack.Looped = true
+
+-- SMOOTHING AYARLARI
+local targetWeight = 1
+local currentWeight = 0
+local lerpSpeed = 0.15 -- Yumuşatma hızı (ne kadar düşükse o kadar yavaş/smooth olur)
+local mermiFrame = 1.99 -- Sabit duracağı kare
+
+-- Başlat
+harmanTrack:Play(0.1, 0, 0) -- 0 ağırlık ve 0 hızla başla
+
+RunService.RenderStepped:Connect(function()
+    local isA = UserInputService:IsKeyDown(Enum.KeyCode.A)
+    local isD = UserInputService:IsKeyDown(Enum.KeyCode.D)
+
+    -- HEDEF AĞIRLIK BELİRLEME
+    if isA or isD then
+        targetWeight = 0 -- Sağa sola giderken görünmez ol
+    else
+        targetWeight = 1 -- Dururken veya W/S yaparken mermi ol
+    end
+
+    -- HAYVAN GİBİ SMOOTHING (LERP)
+    currentWeight = currentWeight + (targetWeight - currentWeight) * lerpSpeed
+    
+    -- Değerleri Uygula
+    if currentWeight > 0.01 then
+        if not harmanTrack.IsPlaying then harmanTrack:Play(0.1, 0, 0) end
+        harmanTrack:AdjustWeight(currentWeight)
+        harmanTrack:AdjustSpeed(0)
+        harmanTrack.TimePosition = mermiFrame
+    else
+        if harmanTrack.IsPlaying and targetWeight == 0 then
+            harmanTrack:AdjustWeight(0) -- Tamamen sıfırla
+            -- Tamamen durdurmuyoruz ki sürekli Play/Stop yükü binmesin, sadece Weight 0 yapıyoruz
+        end
+    end
+end)
